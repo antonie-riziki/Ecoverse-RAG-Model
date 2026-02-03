@@ -26,7 +26,7 @@ load_dotenv()
 GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 if not GEMINI_API_KEY:
-  GEMINI_API_KEY = getpass.getpass("Enter you Google Gemini API key: ")
+  GEMINI_API_KEY = getpass.getpass("Enter your Google Gemini API key: ")
 
 
 
@@ -180,7 +180,7 @@ def query_system(query: str, qa_chain):
     result = qa_chain({"query": query})
     if not result["result"] or "don't know" in result["result"].lower():
       return "The answer could not be found in the provided documents"
-    return f"Reinsure Agent 👷: {result['result']}" #\nSources: {[s.metadata['source'] for s in result['source_documents']]}"
+    return f"Ecoverse Agent 👷: {result['result']}" #\nSources: {[s.metadata['source'] for s in result['source_documents']]}"
   except Exception as e:
     return f"Error processing query: {e}"
 

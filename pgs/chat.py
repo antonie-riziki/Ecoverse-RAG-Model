@@ -14,7 +14,7 @@ from upload_file_rag import get_qa_chain, query_system
 
 
 
-st.image('WhatsApp Image 2025-08-11 at 10.12.18 AM.jpeg', width=900)
+st.image('https://i0.wp.com/www.ecomena.org/wp-content/uploads/2013/12/waste-energy-schematic.jpg', width=900)
 
 # col1, col2 = st.columns(2)
 

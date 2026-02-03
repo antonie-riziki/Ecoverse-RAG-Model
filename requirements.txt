@@ -11,3 +11,5 @@ langchain-google-genai
 streamlit
 streamlit-chat
 streamlit-extras
+pypdf2
+pypdf
