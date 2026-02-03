@@ -12,7 +12,7 @@ pg = st.navigation([td_page])
 
 st.set_page_config(
     page_title="Huduma AI",
-    page_icon="🇰🇪",
+    page_icon=":materials/environmental_health:",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
