@@ -18,6 +18,7 @@ from langchain_core.documents import Document
 
 
 from langchain_core.language_models.chat_models import BaseChatModel
+from langchain_core.outputs import ChatGeneration, ChatResult
 from google import genai
 from langchain_core.messages import HumanMessage, AIMessage
 
@@ -41,35 +42,34 @@ GEMINI_MODEL = "gemini-2.0-flash-001"
 
 
 def get_opik_client(base_client):
-    """
-    Safely wraps the Gemini client with Opik if available.
-    Never crashes the app.
-    """
     try:
         from opik import configure
         from opik.integrations.genai import track_genai
 
         configure()
         return track_genai(base_client)
-
     except Exception as e:
         print("Opik disabled:", str(e))
         return base_client
 
 
 class OpikGeminiChatModel(BaseChatModel):
-    """
-    LangChain-compatible chat model using Gemini + Opik
-    """
 
     def __init__(self, api_key: str, temperature: float = 0.4):
         self.temperature = temperature
 
-        base_client = client
+        base_client = genai.Client(api_key=api_key)
         self.client = get_opik_client(base_client)
 
+    def _messages_to_prompt(self, messages):
+        lines = []
+        for m in messages:
+            role = m.type.upper()
+            lines.append(f"{role}: {m.content}")
+        return "\n".join(lines)
+
     def _generate(self, messages: List[HumanMessage], **kwargs):
-        prompt = "\n".join(m.content for m in messages)
+        prompt = self._messages_to_prompt(messages)
 
         response = self.client.models.generate_content(
             model=GEMINI_MODEL,
@@ -79,7 +79,13 @@ class OpikGeminiChatModel(BaseChatModel):
             }
         )
 
-        return AIMessage(content=response.text)
+        return ChatResult(
+            generations=[
+                ChatGeneration(
+                    message=AIMessage(content=response.text)
+                )
+            ]
+        )
 
     @property
     def _llm_type(self) -> str:
@@ -87,10 +93,6 @@ class OpikGeminiChatModel(BaseChatModel):
 
 
 def load_model():
-    """
-    Loads the Opik-wrapped Gemini model and embeddings
-    """
-
     model = OpikGeminiChatModel(
         api_key=GEMINI_API_KEY,
         temperature=0.4
