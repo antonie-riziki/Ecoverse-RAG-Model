@@ -13,3 +13,4 @@ streamlit-chat
 streamlit-extras
 pypdf2
 pypdf
+faiss-cpu
