@@ -4,11 +4,11 @@ import streamlit as st
 # signin_page = st.Page("./pgs/signin.py", title="sign in", icon=":material/login:")
 # home_page = st.Page("./pgs/main.py", title="home page", icon=":material/home:")
 td_page = st.Page("./pgs/chat.py", title="Self service", icon=":material/language:")
-# chatbot_page = st.Page("./pgs/chatbot.py", title="chatbot", icon=":material/chat:")
+chatbot_page = st.Page("./pgs/chatbot.py", title="chatbot", icon=":material/chat:")
 
 
 
-pg = st.navigation([td_page])
+pg = st.navigation([td_page, chatbot_page], default=td_page)
 
 st.set_page_config(
     page_title="EcoVerse",
