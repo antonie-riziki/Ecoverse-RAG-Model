@@ -16,6 +16,11 @@ from langchain_community.vectorstores import Chroma
 from langchain_community.vectorstores import FAISS
 from langchain_core.documents import Document
 
+
+from langchain_core.language_models.chat_models import BaseChatModel
+from google import genai
+from langchain_core.messages import HumanMessage, AIMessage
+
 warnings.filterwarnings("ignore", category=UserWarning)
 
 sys.path.insert(1, './src')
@@ -29,23 +34,94 @@ if not GEMINI_API_KEY:
   GEMINI_API_KEY = getpass.getpass("Enter your Google Gemini API key: ")
 
 
+GEMINI_MODEL = "gemini-2.0-flash-001"
+
+
+def get_opik_client(base_client):
+    """
+    Safely wraps the Gemini client with Opik if available.
+    Never crashes the app.
+    """
+    try:
+        from opik import configure
+        from opik.integrations.genai import track_genai
+
+        configure()
+        return track_genai(base_client)
+
+    except Exception as e:
+        print("Opik disabled:", str(e))
+        return base_client
+
+
+class OpikGeminiChatModel(BaseChatModel):
+    """
+    LangChain-compatible chat model using Gemini + Opik
+    """
+
+    def __init__(self, api_key: str, temperature: float = 0.4):
+        self.temperature = temperature
+
+        base_client = genai.Client(api_key=api_key)
+        self.client = get_opik_client(base_client)
+
+    def _generate(self, messages: List[HumanMessage], **kwargs):
+        prompt = "\n".join(m.content for m in messages)
+
+        response = self.client.models.generate_content(
+            model=GEMINI_MODEL,
+            contents=prompt,
+            generation_config={
+                "temperature": self.temperature
+            }
+        )
+
+        return AIMessage(content=response.text)
+
+    @property
+    def _llm_type(self) -> str:
+        return "opik-gemini"
+
 
 def load_model():
-  """
-  Func loads the model and embeddings
-  """
-  model = ChatGoogleGenerativeAI(
-      model="models/gemini-2.5-flash",
-      google_api_key=GEMINI_API_KEY,
-      temperature=0.4,
-      convert_system_message_to_human=True
-  )
-  embeddings = GoogleGenerativeAIEmbeddings(
-      # model="models/embedding-004",
-      model="models/text-embedding-004",
-      google_api_key=GEMINI_API_KEY
-  )
-  return model, embeddings
+    """
+    Loads the Opik-wrapped Gemini model and embeddings
+    """
+
+    model = OpikGeminiChatModel(
+        api_key=GEMINI_API_KEY,
+        temperature=0.4
+    )
+
+    embeddings = GoogleGenerativeAIEmbeddings(
+        model="models/text-embedding-004",
+        google_api_key=GEMINI_API_KEY
+    )
+
+    return model, embeddings
+
+
+
+
+
+
+
+# def load_model():
+#   """
+#   Func loads the model and embeddings
+#   """
+#   model = ChatGoogleGenerativeAI(
+#       model="models/gemini-2.5-flash",
+#       google_api_key=GEMINI_API_KEY,
+#       temperature=0.4,
+#       convert_system_message_to_human=True
+#   )
+#   embeddings = GoogleGenerativeAIEmbeddings(
+#       # model="models/embedding-004",
+#       model="models/text-embedding-004",
+#       google_api_key=GEMINI_API_KEY
+#   )
+#   return model, embeddings
 
 
 def load_documents(source_dir: str):
