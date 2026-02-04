@@ -65,8 +65,8 @@ class OpikGeminiChatModel(BaseChatModel):
     def __init__(self, api_key: str, temperature: float = 0.4):
         self.temperature = temperature
 
-        # base_client = genai.Client(api_key=api_key)
-        self.client = get_opik_client(client)
+        base_client = client
+        self.client = get_opik_client(base_client)
 
     def _generate(self, messages: List[HumanMessage], **kwargs):
         prompt = "\n".join(m.content for m in messages)
