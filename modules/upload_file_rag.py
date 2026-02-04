@@ -28,6 +28,9 @@ print(sys.path.insert(1, '../src/'))
 
 load_dotenv()
 
+
+client = genai.Client(api_key=os.getenv("GOOGLE_API_KEY"))
+
 GEMINI_API_KEY = os.environ.get("GOOGLE_API_KEY")
 
 if not GEMINI_API_KEY:
@@ -62,8 +65,8 @@ class OpikGeminiChatModel(BaseChatModel):
     def __init__(self, api_key: str, temperature: float = 0.4):
         self.temperature = temperature
 
-        base_client = genai.Client(api_key=api_key)
-        self.client = get_opik_client(base_client)
+        # base_client = genai.Client(api_key=api_key)
+        self.client = get_opik_client(client)
 
     def _generate(self, messages: List[HumanMessage], **kwargs):
         prompt = "\n".join(m.content for m in messages)
