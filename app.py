@@ -8,7 +8,7 @@ chatbot_page = st.Page("./pgs/chatbot.py", title="chatbot", icon=":material/chat
 
 
 
-pg = st.navigation([td_page, chatbot_page], default=td_page)
+pg = st.navigation([td_page, chatbot_page])
 
 st.set_page_config(
     page_title="EcoVerse",
