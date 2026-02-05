@@ -254,14 +254,26 @@ def get_qa_chain(source_dir):
 
 
 def query_system(query: str, qa_chain):
-  if not qa_chain:
-    return "System not initialized properly"
+    if not hasattr(qa_chain, "invoke"):
+        return f"QA system not initialized properly: {qa_chain}"
 
-  try:
-    result = qa_chain({"query": query})
-    if not result["result"] or "don't know" in result["result"].lower():
-      return "The answer could not be found in the provided documents"
-    return f"Ecoverse Agent 👷: {result['result']}" #\nSources: {[s.metadata['source'] for s in result['source_documents']]}"
-  except Exception as e:
-    return f"Error processing query: {e}"
+    try:
+        result = qa_chain.invoke({"query": query})
+        return f"Ecoverse Agent 👷: {result['result']}"
+    except Exception as e:
+        return f"Error processing query: {e}"
+
+
+
+# def query_system(query: str, qa_chain):
+#   if not qa_chain:
+#     return "System not initialized properly"
+
+#   try:
+#     result = qa_chain({"query": query})
+#     if not result["result"] or "don't know" in result["result"].lower():
+#       return "The answer could not be found in the provided documents"
+#     return f"Ecoverse Agent 👷: {result['result']}" #\nSources: {[s.metadata['source'] for s in result['source_documents']]}"
+#   except Exception as e:
+#     return f"Error processing query: {e}"
 
