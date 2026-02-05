@@ -248,8 +248,8 @@ def get_qa_chain(source_dir):
     return response
 
   except Exception as e:
-    print(f"Error initializing QA system: {e}")
-    return f"Error initializing QA system: {e}"
+    # print(f"Error initializing QA system: {e}")
+    return RuntimeError(f"Error initializing QA system: {e}")
 
 
 
