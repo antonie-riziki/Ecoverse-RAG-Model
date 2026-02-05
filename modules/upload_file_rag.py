@@ -94,8 +94,7 @@ class OpikGeminiChatModel(BaseChatModel):
 
 def load_model():
     model = OpikGeminiChatModel(
-        api_key=GEMINI_API_KEY,
-        
+        api_key=GEMINI_API_KEY
     )
 
     embeddings = GoogleGenerativeAIEmbeddings(
