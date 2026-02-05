@@ -258,7 +258,7 @@ def query_system(query: str, qa_chain):
     return "System not initialized properly"
 
   try:
-    result = qa_chain({"query": query})
+    result = qa_chain.invoke({"query": query})
     if not result["result"] or "don't know" in result["result"].lower():
       return "The answer could not be found in the provided documents"
     return f"Ecoverse Agent 👷: {result['result']}" #\nSources: {[s.metadata['source'] for s in result['source_documents']]}"
