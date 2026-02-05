@@ -38,94 +38,94 @@ if not GEMINI_API_KEY:
   GEMINI_API_KEY = getpass.getpass("Enter your Google Gemini API key: ")
 
 
-GEMINI_MODEL = "gemini-2.0-flash-001"
+# GEMINI_MODEL = "gemini-2.0-flash-001"
 
 
-def get_opik_client(base_client):
-    try:
-        from opik import configure
-        from opik.integrations.genai import track_genai
+# def get_opik_client(base_client):
+#     try:
+#         from opik import configure
+#         from opik.integrations.genai import track_genai
 
-        configure()
-        return track_genai(base_client)
-    except Exception as e:
-        print("Opik disabled:", str(e))
-        return base_client
-
-
-class OpikGeminiChatModel(BaseChatModel):
-
-    def __init__(self, api_key: str):
-        # self.temperature = temperature
-
-        base_client = genai.Client(api_key=api_key)
-        self.client = get_opik_client(base_client)
-
-    def _messages_to_prompt(self, messages):
-        lines = []
-        for m in messages:
-            role = m.type.upper()
-            lines.append(f"{role}: {m.content}")
-        return "\n".join(lines)
-
-    def _generate(self, messages: List[HumanMessage], **kwargs):
-        prompt = self._messages_to_prompt(messages)
-
-        response = self.client.models.generate_content(
-            model=GEMINI_MODEL,
-            contents=prompt,
-            # generation_config={
-            #     "temperature": self.temperature
-            # }
-        )
-
-        return ChatResult(
-            generations=[
-                ChatGeneration(
-                    message=AIMessage(content=response.text)
-                )
-            ]
-        )
-
-    @property
-    def _llm_type(self) -> str:
-        return "opik-gemini"
+#         configure()
+#         return track_genai(base_client)
+#     except Exception as e:
+#         print("Opik disabled:", str(e))
+#         return base_client
 
 
-def load_model():
-    model = OpikGeminiChatModel(
-        api_key=GEMINI_API_KEY
-    )
+# class OpikGeminiChatModel(BaseChatModel):
 
-    embeddings = GoogleGenerativeAIEmbeddings(
-        model="models/text-embedding-004",
-        google_api_key=GEMINI_API_KEY
-    )
+#     def __init__(self, api_key: str):
+#         # self.temperature = temperature
 
-    return model, embeddings
+#         base_client = genai.Client(api_key=api_key)
+#         self.client = get_opik_client(base_client)
 
+#     def _messages_to_prompt(self, messages):
+#         lines = []
+#         for m in messages:
+#             role = m.type.upper()
+#             lines.append(f"{role}: {m.content}")
+#         return "\n".join(lines)
 
+#     def _generate(self, messages: List[HumanMessage], **kwargs):
+#         prompt = self._messages_to_prompt(messages)
 
+#         response = self.client.models.generate_content(
+#             model=GEMINI_MODEL,
+#             contents=prompt,
+#             # generation_config={
+#             #     "temperature": self.temperature
+#             # }
+#         )
 
+#         return ChatResult(
+#             generations=[
+#                 ChatGeneration(
+#                     message=AIMessage(content=response.text)
+#                 )
+#             ]
+#         )
 
+#     @property
+#     def _llm_type(self) -> str:
+#         return "opik-gemini"
 
 
 # def load_model():
-#   """
-#   Func loads the model and embeddings
-#   """
-#   model = ChatGoogleGenerativeAI(
-#       model="models/gemini-2.5-flash",
-#       google_api_key=GEMINI_API_KEY,
-#       temperature=0.4,
-#       convert_system_message_to_human=True
-#   )
-#   embeddings = GoogleGenerativeAIEmbeddings(
-#       # model="models/embedding-004",
-#       model="models/text-embedding-004",
-#       google_api_key=GEMINI_API_KEY
-#   )
-#   return model, embeddings
+#     model = OpikGeminiChatModel(
+#         api_key=GEMINI_API_KEY
+#     )
+
+#     embeddings = GoogleGenerativeAIEmbeddings(
+#         model="models/text-embedding-004",
+#         google_api_key=GEMINI_API_KEY
+#     )
+
+#     return model, embeddings
+
+
+
+
+
+
+
+def load_model():
+  """
+  Func loads the model and embeddings
+  """
+  model = ChatGoogleGenerativeAI(
+      model="models/gemini-2.5-flash",
+      google_api_key=GEMINI_API_KEY,
+      temperature=0.4,
+      convert_system_message_to_human=True
+  )
+  embeddings = GoogleGenerativeAIEmbeddings(
+      # model="models/embedding-004",
+      model="models/text-embedding-004",
+      google_api_key=GEMINI_API_KEY
+  )
+  return model, embeddings
 
 
 def load_documents(source_dir: str):
